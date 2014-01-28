@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "xNRF_Testbed", "xNRF_Testbed\xNRF_Testbed.cproj", "{4510E543-3B6E-404D-8AA7-896BCBD93937}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "XSPI", "XSPI\XSPI.cproj", "{27805A3D-F966-4EFB-BAD9-0BB784E8E452}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "XNRF24L01", "XNRF24L01\XNRF24L01.cproj", "{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4510E543-3B6E-404D-8AA7-896BCBD93937}.Debug|AVR.ActiveCfg = Debug|AVR
+		{4510E543-3B6E-404D-8AA7-896BCBD93937}.Debug|AVR.Build.0 = Debug|AVR
+		{4510E543-3B6E-404D-8AA7-896BCBD93937}.Release|AVR.ActiveCfg = Release|AVR
+		{4510E543-3B6E-404D-8AA7-896BCBD93937}.Release|AVR.Build.0 = Release|AVR
+		{27805A3D-F966-4EFB-BAD9-0BB784E8E452}.Debug|AVR.ActiveCfg = Debug|AVR
+		{27805A3D-F966-4EFB-BAD9-0BB784E8E452}.Debug|AVR.Build.0 = Debug|AVR
+		{27805A3D-F966-4EFB-BAD9-0BB784E8E452}.Release|AVR.ActiveCfg = Release|AVR
+		{27805A3D-F966-4EFB-BAD9-0BB784E8E452}.Release|AVR.Build.0 = Release|AVR
+		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Debug|AVR.ActiveCfg = Debug|AVR
+		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Debug|AVR.Build.0 = Debug|AVR
+		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Release|AVR.ActiveCfg = Release|AVR
+		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
