@@ -50,5 +50,36 @@ void xnrf_write_payload(xnrf_config_t *config, uint8_t *data, uint8_t len) {
 	xspi_transfer_byte(config->spi, W_TX_PAYLOAD);
 	while (len--)
 		xspi_transfer_byte(config->spi, *data++);
-	xnrf_deselect(config);	
+	xnrf_deselect(config);
+}
+
+void xnrf_set_datarate(xnrf_config_t *config, xnrf_datarate_t rate) {
+	uint8_t setup = xnrf_read_register(config, RF_SETUP);
+
+	switch (rate) {
+		case XNRF_250KBPS:
+			setup |= (1 << RF_DR_LOW);
+			setup &= ~(1 << RF_DR_HIGH);
+			break;
+		case XNRF_1MBPS:
+			setup &= ~((1 << RF_DR_LOW) | (1 << RF_DR_HIGH));
+			break;
+		case XNRF_2MBPS:
+			setup &= ~(1 << RF_DR_LOW);
+			setup |= (1 << RF_DR_HIGH);
+			break;
+	}
+	xnrf_write_register(config, RF_SETUP, setup);	
+}
+
+void xnrf_set_tx_address(xnrf_config_t *config, uint8_t *address) {
+	xnrf_write_register_buffer(config, TX_ADDR, address, 5);
+}
+
+void xnrf_set_rx0_address(xnrf_config_t *config, uint8_t *address) {
+	xnrf_write_register_buffer(config, RX_ADDR_P0, address, 5);
+}
+
+void xnrf_set_rx1_address(xnrf_config_t *config, uint8_t *address) {
+	xnrf_write_register_buffer(config, RX_ADDR_P1, address, 5);
 }

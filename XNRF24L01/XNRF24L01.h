@@ -23,6 +23,10 @@
 #include "nRF24L01.h"
 #include "XSPI.h"
 
+
+#define NRF_INTERFACE SPI		/* uses hardware SPI */
+//#define NRF_INTERFACE USART	/* uses USART in Master SPI mode */
+
 //TODO: Update this to support USART and move confbits elsewhere.
 /*! \brief Structure which defines some items needed for nRF and SPI control.
  *  \param spi Pointer to the SPI module this nRF is connected to.
@@ -41,6 +45,16 @@ typedef struct {
 	uint8_t confbits;
 } xnrf_config_t;
 
+typedef enum {
+	XNRF_250KBPS,
+	XNRF_1MBPS,
+	XNRF_2MBPS
+} xnrf_datarate_t;
+
+/************************************************************************/
+/* INLINE FUCTIONS                                                      */
+/************************************************************************/
+
 /*! \brief Pulls the Slave Select line low and selects our nRF.
  *  \param config Pointer to a xnrf_config_t structure.
  */
@@ -54,6 +68,20 @@ static inline void xnrf_select(xnrf_config_t *config) {
 static inline void xnrf_deselect(xnrf_config_t *config) {
 	config->ss_port->OUTSET = (1 << config->ss_pin);
 }
+
+/*! \brief Pulls the Chip Enable line high and enables our nRF.
+ *  \param config Pointer to a xnrf_config_t structure.
+ */
+ static inline void xnrf_enable(xnrf_config_t *config) {
+	config->ce_port->OUTSET = (1 << config->ce_pin);
+ }
+
+/*! \brief Pulls the Chip Enable line low and disables our nRF.
+ *  \param config Pointer to a xnrf_config_t structure.
+ */
+ static inline void xnrf_disable(xnrf_config_t *config) {
+	config->ce_port->OUTCLR = (1 << config->ce_pin);
+ }
 
 /*! \brief Flushes the RX FIFO.
  *  \param config Pointer to a xnrf_config_t structure.
@@ -118,7 +146,9 @@ static inline void xnrf_write_register(xnrf_config_t *config, uint8_t reg, uint8
  *  \param config Pointer to a xnrf_config_t structure.
  */
 static inline void xnrf_powerup_tx (xnrf_config_t *config) {
-	xnrf_write_register(config, CONFIG, (config->confbits | ((1<<PWR_UP) | (0<<PRIM_RX))));
+	config->confbits |= (1 << PWR_UP);
+	config->confbits &= ~(1 << PRIM_RX);
+	xnrf_write_register(config, CONFIG, config->confbits);
 }
 
 //TODO: need to move confbits elsewhere to they can change at runtime */
@@ -126,7 +156,7 @@ static inline void xnrf_powerup_tx (xnrf_config_t *config) {
  *  \param config Pointer to a xnrf_config_t structure.
  */
 static inline void xnrf_powerup_rx (xnrf_config_t *config) {
-	xnrf_write_register(config, CONFIG, (config->confbits | ((1<<PWR_UP) | (1<<PRIM_RX))));
+	xnrf_write_register(config, CONFIG, (config->confbits | ((1 << PWR_UP) | (1 << PRIM_RX))));
 }
 
 /*! \brief Powers down the nRF.
@@ -134,7 +164,7 @@ static inline void xnrf_powerup_rx (xnrf_config_t *config) {
  */
 //TODO: need to move confbits elsewhere to they can change at runtime */
 static inline void xnrf_powerdown (xnrf_config_t *config) {
-	xnrf_write_register(config, CONFIG, (config->confbits | (0<<PWR_UP)));
+	xnrf_write_register(config, CONFIG, (config->confbits & ~(1 << PWR_UP)));
 }
 
 /*! \brief Sets the nRF channel.
@@ -143,6 +173,10 @@ static inline void xnrf_powerdown (xnrf_config_t *config) {
 static inline void xnrf_set_channel (xnrf_config_t *config, uint8_t channel) {
 	xnrf_write_register(config, RF_CH, channel);
 }
+
+/************************************************************************/
+/* Called functions                                                     */
+/************************************************************************/
 
 /*! \brief Retrieves an array of bytes for the given register.
  *  \param config Pointer to a xnrf_config_t structure.
@@ -174,4 +208,15 @@ void xnrf_read_payload(xnrf_config_t *config, uint8_t *data, uint8_t len);
  */
 void xnrf_write_payload(xnrf_config_t *config, uint8_t *data, uint8_t len);
 
+/*! \brief Sets the air datarate.
+ *  \param config Pointer to a xnrf_config_t structure.
+ *  \param rate Datarate to use.
+ */
+void xnrf_set_datarate(xnrf_config_t *config, xnrf_datarate_t rate);
+
+void xnrf_set_tx_address(xnrf_config_t *config, uint8_t *address);
+
+void xnrf_set_rx0_address(xnrf_config_t *config, uint8_t *address);
+
+void xnrf_set_rx1_address(xnrf_config_t *config, uint8_t *address);
 #endif /* XNRF24L01_H_ */
