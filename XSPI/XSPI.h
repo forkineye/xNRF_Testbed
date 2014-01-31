@@ -18,7 +18,7 @@
  */ 
 
 #ifndef F_CPU
-#	define F_CPU 32000000UL
+#   define F_CPU 32000000UL
 #endif
 
 #ifndef XSPI_H_
@@ -32,33 +32,33 @@ defined (__AVR_ATxmega32A4__) || \
 defined (__AVR_ATxmega32A4U__) || \
 defined (__AVR_ATxmega64A4U__) || \
 defined (__AVR_ATxmega128A4U__)
-#	define XSPI_MOSI	PIN5_bm
-#	define XSPI_MISO	PIN6_bm
-#	define XSPI_SCK		PIN7_bm
-#	define XSPI_SS		PIN4_bm
-#	define XSPI_XCK0	PIN1_bm
-#	define XSPI_RXD0	PIN2_bm
-#	define XSPI_TXD0	PIN3_bm
-#	define XSPI_XCK1	PIN5_bm
-#	define XSPI_RXD1	PIN6_bm
-#	define XSPI_TXD1	PIN7_bm
+#   define XSPI_MOSI    PIN5_bm
+#   define XSPI_MISO    PIN6_bm
+#   define XSPI_SCK     PIN7_bm
+#   define XSPI_SS      PIN4_bm
+#   define XSPI_XCK0    PIN1_bm
+#   define XSPI_RXD0    PIN2_bm
+#   define XSPI_TXD0    PIN3_bm
+#   define XSPI_XCK1    PIN5_bm
+#   define XSPI_RXD1    PIN6_bm
+#   define XSPI_TXD1    PIN7_bm
 #elif defined (__AVR_ATxmega8E5__) || \
 defined (__AVR_ATxmega16E5__) || \
 defined (__AVR_ATxmega32E5__)
-#	define XSPI_MOSI	PIN7_bm
-#	define XSPI_MISO	PIN6_bm
-#	define XSPI_SCK		PIN5_bm
-#	define XSPI_SS		PIN4_bm
-#	define XSPI_XCK0	PIN1_bm
-#	define XSPI_RXD0	PIN2_bm
-#	define XSPI_TXD0	PIN3_bm
+#   define XSPI_MOSI    PIN7_bm
+#   define XSPI_MISO    PIN6_bm
+#   define XSPI_SCK     PIN5_bm
+#   define XSPI_SS      PIN4_bm
+#   define XSPI_XCK0    PIN1_bm
+#   define XSPI_RXD0    PIN2_bm
+#   define XSPI_TXD0    PIN3_bm
 /* if remapped? 
-#	define XSPI_XCK1	PIN5_bm
-#	define XSPI_RXD1	PIN6_bm
-#	define XSPI_TXD1	PIN7_bm
+#   define XSPI_XCK1	PIN5_bm
+#   define XSPI_RXD1	PIN6_bm
+#   define XSPI_TXD1	PIN7_bm
 */
 #else
-#  warning ** Device not supported by XSPI **
+#   error ** Device not supported by XSPI **
 #endif
 
 /************************************************************************/
@@ -74,9 +74,9 @@ defined (__AVR_ATxmega32E5__)
  *  \param clk2x Enables SPI clock double-speed.
  */
 static inline void xspi_master_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bool lsb, SPI_PRESCALER_t prescaler, bool clk2x) {
-	port->DIRSET = XSPI_MOSI | XSPI_SCK | XSPI_SS;
-	spi->CTRL = SPI_ENABLE_bm |	SPI_MASTER_bm | mode | prescaler |
-			(clk2x ? SPI_CLK2X_bm : 0) | (lsb ? SPI_DORD_bm : 0);
+    port->DIRSET = XSPI_MOSI | XSPI_SCK | XSPI_SS;
+    spi->CTRL = SPI_ENABLE_bm |	SPI_MASTER_bm | mode | prescaler |
+            (clk2x ? SPI_CLK2X_bm : 0) | (lsb ? SPI_DORD_bm : 0);
 }
 
 /*! \brief SPI Slave initialization function.
@@ -86,9 +86,9 @@ static inline void xspi_master_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, b
  *  \param lsb Set to true for LSB data, false for MSB.
  */
 static inline void xspi_slave_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bool lsb) {
-	port->DIRSET = XSPI_MISO;
-	port->DIRCLR = XSPI_SCK | XSPI_SS;
-	spi->CTRL = SPI_ENABLE_bm | mode | (lsb ? SPI_DORD_bm : 0);
+    port->DIRSET = XSPI_MISO;
+    port->DIRCLR = XSPI_SCK | XSPI_SS;
+    spi->CTRL = SPI_ENABLE_bm | mode | (lsb ? SPI_DORD_bm : 0);
 }
 
 /*! \brief Blocking call that sends and returns a single byte.
@@ -96,9 +96,9 @@ static inline void xspi_slave_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bo
  *  \return Single byte read from SPI.
  */
 static inline uint8_t xspi_transfer_byte(SPI_t *spi, uint8_t val) {
-	spi->DATA = val;
-	while(!(spi->STATUS & SPI_IF_bm));
-	return spi->DATA;
+    spi->DATA = val;
+    while(!(spi->STATUS & SPI_IF_bm));
+    return spi->DATA;
 }
 
 /*! \brief Sends a packet, ignoring any returned SPI data.
@@ -121,7 +121,7 @@ void xspi_get_packet(SPI_t *spi, uint8_t *data, uint8_t len);
 /************************************************************************/
 #define USART_UDORD_bm USART_CHSIZE2_bm
 #define USART_UCPHA_bm USART_CHSIZE1_bm
-#define SERIAL_SPI_UBBRVAL(Baud)	((Baud < (F_CPU / 2)) ? ((F_CPU / (2 * Baud)) - 1) : 0)
+#define SERIAL_SPI_UBBRVAL(Baud)    ((Baud < (F_CPU / 2)) ? ((F_CPU / (2 * Baud)) - 1) : 0)
 
 /*! \brief SPI Master USART initialization function.
  *  \param port Pointer to the port on which this SPI module resides.
@@ -132,13 +132,13 @@ void xspi_get_packet(SPI_t *spi, uint8_t *data, uint8_t len);
  *  \param clk2x Enables SPI clock double-speed.
  */
 static inline void xspi_usart_master_init(PORT_t *port, USART_t *usart, SPI_MODE_t mode, uint32_t baudrate) {
-	uint16_t baudval = SERIAL_SPI_UBBRVAL(baudrate);
+    uint16_t baudval = SERIAL_SPI_UBBRVAL(baudrate);
 	
-	usart->BAUDCTRLB = (baudval >> 8);
-	usart->BAUDCTRLA = (baudval & 0xFF);
-	// For now, only Mode 0 supported.
-	usart->CTRLC = USART_CMODE_MSPI_gc;
-	usart->CTRLB = (USART_RXEN_bm | USART_TXEN_bm); 	
+    usart->BAUDCTRLB = (baudval >> 8);
+    usart->BAUDCTRLA = (baudval & 0xFF);
+    // For now, only Mode 0 supported.
+    usart->CTRLC = USART_CMODE_MSPI_gc;
+    usart->CTRLB = (USART_RXEN_bm | USART_TXEN_bm); 	
 }
 
 /*! \brief Blocking call that sends and returns a single byte.
@@ -147,10 +147,10 @@ static inline void xspi_usart_master_init(PORT_t *port, USART_t *usart, SPI_MODE
  *  \return Single byte read from SPI.
  */
 static inline uint8_t xspi_usart_transfer_byte(USART_t *usart, uint8_t val) {
-	usart->DATA = val;
-	while(!(usart->STATUS & USART_TXCIF_bm));
-	usart->STATUS = USART_TXCIF_bm;
-	return usart->DATA;
+    usart->DATA = val;
+    while(!(usart->STATUS & USART_TXCIF_bm));
+    usart->STATUS = USART_TXCIF_bm;
+    return usart->DATA;
 }
 
 /*! \brief Blocking call that sends a single buffered byte.
@@ -158,8 +158,8 @@ static inline uint8_t xspi_usart_transfer_byte(USART_t *usart, uint8_t val) {
  *  \param val Byte to send.
  */
 static inline void xspi_usart_send_byte(USART_t *usart, uint8_t val) {
-	while (!(usart->STATUS & USART_DREIF_bm));
-	usart->DATA = val;
+    while (!(usart->STATUS & USART_DREIF_bm));
+    usart->DATA = val;
 }
 
 /*! \brief Blocking call that retrieves a single byte.
@@ -167,7 +167,7 @@ static inline void xspi_usart_send_byte(USART_t *usart, uint8_t val) {
  *  \return Next byte from the UART
  */
 static inline uint8_t xspi_usart_get_byte(USART_t *usart) {
-	return xspi_usart_transfer_byte(usart, 0xFF);
+    return xspi_usart_transfer_byte(usart, 0xFF);
 }
 
 /*! \brief Sends a packet of data via UART in Master SPI mode.
