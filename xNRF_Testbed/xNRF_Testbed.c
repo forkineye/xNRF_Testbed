@@ -29,10 +29,12 @@
 
 static xnrf_config_t xnrf_config = {
     .spi = &SPIC,
+    .spi_port = &PORTC,
     .ss_port = &PORTC,
     .ss_pin = 4,
     .ce_port = &PORTC,
     .ce_pin  = 2,
+    .addr_width = 5,
     .confbits = 0b01011100
     //.confbits = ((1 << EN_CRC) | (1 << CRCO)) //TODO: move confbits elsewhere for runtime config changes
 };
@@ -47,41 +49,35 @@ void init() {
     CLK.CTRL = CLK_SCLKSEL_RC32M_gc;                /* Switch to 32MHz clock */
     OSC.CTRL &= ~OSC_RC2MEN_bm;                     /* Disable 2Mhz oscillator */
 	
-    // Initialize SPI to 4Mhz
-    PORTC.DIRSET = PIN4_bm; /* slave select pin */
-    PORTC.DIRSET = PIN2_bm; /* chip enable pin */
-    xspi_master_init(&PORTC, &SPIC, SPI_MODE_0_gc, false, SPI_PRESCALER_DIV16_gc, true);
-    //xspi_usart_master_init(&PORTC, &USARTC0, SPI_MODE_0_gc, 4000000);
-	
     //PORTE.DIRSET = PIN1_bm; /* A4U LED */
     PORTA.DIRSET = PIN0_bm; /* E5 LED */
 }
 
 int main(void) {
     init();
-	
-    // let radio settle
-    _delay_ms(50);
+
+    // Initialize XNRF driver
+	xnrf_init(&xnrf_config);
 	
     uint8_t	testdata[32] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68,
                             0x69, 0x6A, 0x6B, 0x6C, 0x6D, 0x6E, 0x6F, 0x70,
                             0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
                             0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80};
 
-    const uint64_t tx_addr = 0xF0F0F0F0D2LL;
-    const uint64_t rx_addr1 = 0xF0F0F0F0E1LL;
+    uint64_t tx_addr = 0xF0F0F0F0D2LL;
+    uint64_t rx_addr1 = 0xF0F0F0F0E1LL;
 	
     // set channel, speed, and disable ack's.
     xnrf_set_channel(&xnrf_config, 100);
     xnrf_set_datarate(&xnrf_config, XNRF_2MBPS);
     xnrf_write_register(&xnrf_config, EN_AA, 0);
-
+    
     // set addresses
     xnrf_set_tx_address(&xnrf_config, (uint8_t*)&tx_addr);
     xnrf_set_rx0_address(&xnrf_config, (uint8_t*)&tx_addr);
     xnrf_set_rx1_address(&xnrf_config, (uint8_t*)&rx_addr1);
-	
-    // power-up transmitter
+
+    // power-up transmitter and give 5ms to stabilize
     xnrf_powerup_tx(&xnrf_config);
     _delay_ms(5);
 	

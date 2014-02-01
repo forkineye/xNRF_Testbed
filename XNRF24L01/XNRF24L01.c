@@ -17,9 +17,40 @@
  *
  */ 
 
+//TODO: Move all these clock defines elsewhere
+#ifndef F_CPU
+#   define F_CPU 32000000UL
+#endif
+
 #include <avr/io.h>
+#include <util/delay.h>
 #include "XSPI.h"
 #include "XNRF24L01.h"
+
+//TODO: Change xnrf_init so it doesn't assume a 32MHz clock, or change xspi_master_init to reference baud rates.
+//TODO: Change this to xnrf_init_spi and add xnrf_init_usart??
+void xnrf_init(xnrf_config_t *config) {
+    // Make sure our nRF powered and stabilized, per the datasheet for power-on state transition. 
+    _delay_ms(100);
+    
+    // Initialize SPI to 4Mhz, assume a 32Mhz clock
+    config->ss_port->DIRSET = (1 << config->ss_pin);
+    config->ce_port->DIRSET = (1 << config->ce_pin);
+    xspi_master_init(config->spi_port, config->spi, SPI_MODE_0_gc, false, SPI_PRESCALER_DIV16_gc, true);
+    //xspi_usart_master_init(&PORTC, &USARTC0, SPI_MODE_0_gc, 4000000);
+    
+    // configure address width
+    xnrf_set_address_width(config, config->addr_width);
+    
+    //TODO: change this to only set default width when pipe is enabled? Does it matter?
+    // configure default payload widths for all pipes
+    xnrf_write_register(config, RX_PW_P0, config->payload_width);
+    xnrf_write_register(config, RX_PW_P1, config->payload_width);
+    xnrf_write_register(config, RX_PW_P2, config->payload_width);
+    xnrf_write_register(config, RX_PW_P3, config->payload_width);
+    xnrf_write_register(config, RX_PW_P4, config->payload_width);
+    xnrf_write_register(config, RX_PW_P5, config->payload_width);
+}
 
 void xnrf_read_register_buffer(xnrf_config_t *config, uint8_t reg, uint8_t *data, uint8_t len) {
     xnrf_select(config);
@@ -72,14 +103,11 @@ void xnrf_set_datarate(xnrf_config_t *config, xnrf_datarate_t rate) {
     xnrf_write_register(config, RF_SETUP, setup);	
 }
 
-void xnrf_set_tx_address(xnrf_config_t *config, uint8_t *address) {
-    xnrf_write_register_buffer(config, TX_ADDR, address, 5);
-}
-
-void xnrf_set_rx0_address(xnrf_config_t *config, uint8_t *address) {
-    xnrf_write_register_buffer(config, RX_ADDR_P0, address, 5);
-}
-
-void xnrf_set_rx1_address(xnrf_config_t *config, uint8_t *address) {
-    xnrf_write_register_buffer(config, RX_ADDR_P1, address, 5);
+void xnrf_set_address_width(xnrf_config_t *config, uint8_t width) {
+    if (width == 3)
+        xnrf_write_register(config, SETUP_AW, 1);
+    else if (width == 4)
+        xnrf_write_register(config, SETUP_AW, 2);
+    else
+        xnrf_write_register(config, SETUP_AW, 3);
 }

@@ -17,14 +17,16 @@
  *
  */ 
 
-#ifndef F_CPU
-#   define F_CPU 32000000UL
-#endif
+
 
 #ifndef XSPI_H_
 #define XSPI_H_
 
 #include <stdbool.h>
+
+#ifndef F_CPU
+#   define F_CPU 32000000UL
+#endif
 
 #if defined(__AVR_ATXmega16A4__) || \
 defined (__AVR_ATxmega16A4U__) || \
