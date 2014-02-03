@@ -29,6 +29,7 @@
 #include <stdbool.h>
 #include "XNRF24L01.h"
 #include "XSPI.h"
+#include "XUSART.h"
 
 static xnrf_config_t xnrf_config = {
     .spi = &SPIC,
@@ -150,6 +151,79 @@ void rx_poll_loop() {
     }
 }
 
+/* loop for testing USART with echos */
+void usart_echo_poll_loop() {
+    /* nrfBridge / E5 configuration
+     *  PD1 - direction control
+     *  PD2 - RX
+     *  PD3 - TX
+     */
+    uint8_t data;
+    
+    PORTD.DIRSET = PIN1_bm | PIN3_bm;               /* set PD1 and PD3 as outputs */
+    xusart_set_format(&USARTD0, USART_CHSIZE_8BIT_gc,
+            USART_PMODE_DISABLED_gc, false);        /* 8N1 on USARTD0 */
+    xusart_set_baudrate(&USARTD0, 115200, F_CPU);   /* set baud rate */
+    xusart_enable_rx(&USARTD0);                     /* Enable module RX */
+    xusart_enable_tx(&USARTD0);                     /* Enable module TX */
+    PORTD.OUTCLR = PIN1_bm;                         /* Initialize in RX mode -- RS485 direction control on nRFbridge */
+    
+    while (1) {
+        data = xusart_getchar(&USARTD0);            /* get a character */
+        PORTD.OUTSET = PIN1_bm;                     /* switch to TX mode */
+        //_delay_us(1);                             /* may need for state transition in some driver chips */   
+        xusart_putchar(&USARTD0, data);             /* echo our character */
+
+        while (!(USARTD0.STATUS & USART_TXCIF_bm)); /* wait until TX is complete */
+        _delay_us(86);                              /* Give the RS485 chip time do its thing before switching back to RX mode ((1/baudrate)*10) */
+        PORTD.OUTCLR = PIN1_bm;                     /* switch back to RX mode */
+        //_delay_us(1);                             /* may need for state transition in some driver chips */   
+        
+        // Toggle LED
+        PORTA.OUTTGL = PIN0_bm; /* E5 LED */
+    }
+}
+
+/* This is setup for my nRFbridge board.
+ * Just a simple polling test that echos nRF received data via USART.
+ */
+void nrf_to_usart_loop() {
+    PORTD.DIRSET = PIN1_bm | PIN3_bm;               /* set PD1 and PD3 as outputs */
+    xusart_set_format(&USARTD0, USART_CHSIZE_8BIT_gc,
+            USART_PMODE_DISABLED_gc, false);        /* 8N1 on USARTD0 */
+    xusart_set_baudrate(&USARTD0, 115200, F_CPU);   /* set baud rate */
+    xusart_enable_tx(&USARTD0);                     /* Enable module TX */
+    PORTD.OUTSET = PIN1_bm;                         /* Initialize in TX mode -- RS485 direction control on nRFbridge */
+
+    // power-up receiver and give 5ms to stabilize
+    xnrf_powerup_rx(&xnrf_config);
+    _delay_ms(5);
+
+    // start listening
+    xnrf_enable(&xnrf_config);
+    //_delay_ms(130); /* do we need to delay for state transition? status should return RX_DR empty util radio is ready i would assume */
+    
+    while (1) {
+        if(xnrf_get_status(&xnrf_config) & (1 << RX_DR)) {                          /* check the RX_DR status to see if we have a packet */
+            xnrf_read_payload(&xnrf_config, rxbuff, xnrf_config.payload_width);     /* retrieve the payload */
+            xnrf_write_register(&xnrf_config, NRF_STATUS, (1 << RX_DR));            /* reset the RX_DR status */
+            //TODO: Check FIFO status to keep reading payloads if needed
+
+            //TODO: Proper implementation with a ring buffer
+            for(uint8_t i=0; i < xnrf_config.payload_width; i++) {
+                xusart_putchar(&USARTD0, rxbuff[i]);
+            }
+            xusart_putchar(&USARTD0, 0x0D);
+            xusart_putchar(&USARTD0, 0x0A);
+
+            // Toggle status LED
+            PORTA.OUTTGL = PIN0_bm; /* E5 LED */
+        }
+    }
+
+    
+}
+
 int main(void) {
     init();
 
@@ -174,9 +248,14 @@ int main(void) {
     //tx_loop();
     
     // RX text loop - interrupt driven
-    rx_int_loop();
+    //rx_int_loop();
     
     // RX test loop - polled
     //rx_poll_loop();
     
+    // USART echo testing loop - polled
+    //usart_echo_poll_loop();
+    
+    // Dump nRF data to serial
+    nrf_to_usart_loop();
 }

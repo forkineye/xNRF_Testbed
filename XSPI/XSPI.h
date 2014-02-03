@@ -68,12 +68,12 @@ defined (__AVR_ATxmega32E5__)
 /************************************************************************/
 
 /*! \brief SPI Master initialization function.
- *  \param port Pointer to the port on which this SPI module resides.
- *  \param spi Pointer to SPI_t module structure.
- *  \param mode Clock and polarity mode for SPI.
- *  \param lsb Set to true for LSB data, false for MSB.
- *  \param prescaler SPI clock prescaler value.
- *  \param clk2x Enables SPI clock double-speed.
+ *  \param port         Pointer to the port on which this SPI module resides.
+ *  \param spi          Pointer to SPI_t module structure.
+ *  \param mode         Clock and polarity mode for SPI.
+ *  \param lsb          Set to true for LSB data, false for MSB.
+ *  \param prescaler    SPI clock prescaler value.
+ *  \param clk2x        Enables SPI clock double-speed.
  */
 static inline void xspi_master_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bool lsb, SPI_PRESCALER_t prescaler, bool clk2x) {
     port->DIRSET = XSPI_MOSI | XSPI_SCK | XSPI_SS;
@@ -83,9 +83,9 @@ static inline void xspi_master_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, b
 
 /*! \brief SPI Slave initialization function.
  *  \param port Pointer to the port on which this SPI module resides.
- *  \param spi Pointer to XSPI_t configuration structure.
+ *  \param spi  Pointer to XSPI_t configuration structure.
  *  \param mode Clock and polarity mode for SPI.
- *  \param lsb Set to true for LSB data, false for MSB.
+ *  \param lsb  Set to true for LSB data, false for MSB.
  */
 static inline void xspi_slave_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bool lsb) {
     port->DIRSET = XSPI_MISO;
@@ -94,8 +94,8 @@ static inline void xspi_slave_init(PORT_t *port, SPI_t *spi, SPI_MODE_t mode, bo
 }
 
 /*! \brief Blocking call that sends and returns a single byte.
- *  \param spi Pointer to SPI_t module structure.
- *  \return Single byte read from SPI.
+ *  \param spi  Pointer to SPI_t module structure.
+ *  \return     Single byte read from SPI.
  */
 static inline uint8_t xspi_transfer_byte(SPI_t *spi, uint8_t val) {
     spi->DATA = val;
@@ -104,16 +104,16 @@ static inline uint8_t xspi_transfer_byte(SPI_t *spi, uint8_t val) {
 }
 
 /*! \brief Sends a packet, ignoring any returned SPI data.
- *  \param spi Pointer to SPI_t module structure.
+ *  \param spi  Pointer to SPI_t module structure.
  *  \param data Pointer to the data being sent.
- *  \param len Length in bytes of the data being sent.
+ *  \param len  Length in bytes of the data being sent.
  */
 void xspi_send_packet(SPI_t *spi, uint8_t *data, uint8_t len);
 
 /*! \brief Retrieves a packet of data via SPI
- *  \param spi Pointer to SPI_t module structure.
+ *  \param spi  Pointer to SPI_t module structure.
  *  \param data Pointer to a buffer to store the retrieved data.
- *  \param len Size of the buffer in bytes.
+ *  \param len  Size of the buffer in bytes.
  */
 void xspi_get_packet(SPI_t *spi, uint8_t *data, uint8_t len);
 
@@ -126,12 +126,12 @@ void xspi_get_packet(SPI_t *spi, uint8_t *data, uint8_t len);
 #define SERIAL_SPI_UBBRVAL(Baud)    ((Baud < (F_CPU / 2)) ? ((F_CPU / (2 * Baud)) - 1) : 0)
 
 /*! \brief SPI Master USART initialization function.
- *  \param port Pointer to the port on which this SPI module resides.
- *  \param usart Pointer to USART_t module structure.
- *  \param mode Clock and polarity mode for SPI.
- *  \param lsb Set to true for LSB data, false for MSB.
- *  \param prescaler SPI clock prescaler value.
- *  \param clk2x Enables SPI clock double-speed.
+ *  \param port         Pointer to the port on which this SPI module resides.
+ *  \param usart        Pointer to USART_t module structure.
+ *  \param mode         Clock and polarity mode for SPI.
+ *  \param lsb          Set to true for LSB data, false for MSB.
+ *  \param prescaler    SPI clock prescaler value.
+ *  \param clk2x        Enables SPI clock double-speed.
  */
 static inline void xspi_usart_master_init(PORT_t *port, USART_t *usart, SPI_MODE_t mode, uint32_t baudrate) {
     uint16_t baudval = SERIAL_SPI_UBBRVAL(baudrate);
@@ -144,9 +144,9 @@ static inline void xspi_usart_master_init(PORT_t *port, USART_t *usart, SPI_MODE
 }
 
 /*! \brief Blocking call that sends and returns a single byte.
- *  \param usart Pointer to USART_t module structure.
- *  \param val Byte to send.
- *  \return Single byte read from SPI.
+ *  \param usart    Pointer to USART_t module structure.
+ *  \param val      Byte to send.
+ *  \return         Single byte read from SPI.
  */
 static inline uint8_t xspi_usart_transfer_byte(USART_t *usart, uint8_t val) {
     usart->DATA = val;
@@ -156,8 +156,8 @@ static inline uint8_t xspi_usart_transfer_byte(USART_t *usart, uint8_t val) {
 }
 
 /*! \brief Blocking call that sends a single buffered byte.
- *  \param usart Pointer to USART_t module structure.
- *  \param val Byte to send.
+ *  \param usart    Pointer to USART_t module structure.
+ *  \param val      Byte to send.
  */
 static inline void xspi_usart_send_byte(USART_t *usart, uint8_t val) {
     while (!(usart->STATUS & USART_DREIF_bm));
@@ -165,24 +165,24 @@ static inline void xspi_usart_send_byte(USART_t *usart, uint8_t val) {
 }
 
 /*! \brief Blocking call that retrieves a single byte.
- *  \param usart Pointer to USART_t module structure.
- *  \return Next byte from the UART
+ *  \param usart    Pointer to USART_t module structure.
+ *  \return         Next byte from the UART
  */
 static inline uint8_t xspi_usart_get_byte(USART_t *usart) {
     return xspi_usart_transfer_byte(usart, 0xFF);
 }
 
 /*! \brief Sends a packet of data via UART in Master SPI mode.
- *  \param usart Pointer to USART_t module structure.
- *  \param data Pointer to a buffer to store the retrieved data.
- *  \param len Size of the buffer in bytes.
+ *  \param usart    Pointer to USART_t module structure.
+ *  \param data     Pointer to a buffer to store the retrieved data.
+ *  \param len      Size of the buffer in bytes.
  */
 void xspi_usart_send_packet(USART_t *usart, uint8_t *data, uint8_t len);
 
 /*! \brief Retrieves a packet of data via UART in Master SPI mode.
- *  \param usart Pointer to USART_t module structure.
- *  \param data Pointer to a buffer to store the retrieved data.
- *  \param len Size of the buffer in bytes.
+ *  \param usart    Pointer to USART_t module structure.
+ *  \param data     Pointer to a buffer to store the retrieved data.
+ *  \param len      Size of the buffer in bytes.
  */
 void xspi_usart_get_packet(USART_t *usart, uint8_t *data, uint8_t len);
 

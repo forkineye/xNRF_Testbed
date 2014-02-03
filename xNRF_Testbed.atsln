@@ -7,6 +7,8 @@ Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "XSPI", "XSPI\XSPI.cproj", "
 EndProject
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "XNRF24L01", "XNRF24L01\XNRF24L01.cproj", "{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}"
 EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "XUSART", "XUSART\XUSART.cproj", "{DE53A47D-A1DF-48B2-8969-3EB8F7737057}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|AVR = Debug|AVR
@@ -25,6 +27,10 @@ Global
 		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Debug|AVR.Build.0 = Debug|AVR
 		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Release|AVR.ActiveCfg = Release|AVR
 		{5D5552BB-149F-4A92-8D59-B7DAA7E10A38}.Release|AVR.Build.0 = Release|AVR
+		{DE53A47D-A1DF-48B2-8969-3EB8F7737057}.Debug|AVR.ActiveCfg = Debug|AVR
+		{DE53A47D-A1DF-48B2-8969-3EB8F7737057}.Debug|AVR.Build.0 = Debug|AVR
+		{DE53A47D-A1DF-48B2-8969-3EB8F7737057}.Release|AVR.ActiveCfg = Release|AVR
+		{DE53A47D-A1DF-48B2-8969-3EB8F7737057}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
